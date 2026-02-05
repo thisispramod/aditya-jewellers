@@ -21,9 +21,9 @@ const db = mysql.createPool({
 // Test database connection
 db.getConnection((err, connection) => {
     if (err) {
-        console.error('❌ Database connection failed:', err.message);
+        console.error('Database connection failed:', err.message);
     } else {
-        console.log('✅ Database connected successfully');
+        console.log('Database connected successfully');
         connection.release();
     }
 });
@@ -178,5 +178,5 @@ app.post('/api/inquire', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`https://aditya-jewellers-delta.vercel.app`);
 });
