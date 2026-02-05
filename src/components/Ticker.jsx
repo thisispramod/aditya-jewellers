@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 const Ticker = () => {
     // Mock prices as fallback, in a real app these would come from an API
     const [prices, setPrices] = useState({
-        gold24k: 7250,
-        gold22k: 6650,
-        silver: 88.50
+        gold24k: 14250,
+        gold22k: 13650,
+        silver: 232.50
     });
 
     useEffect(() => {
