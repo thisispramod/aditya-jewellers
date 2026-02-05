@@ -49,7 +49,7 @@ const Contact = () => {
                     </div>
 
                     <a
-                        href="https://wa.me/919876543210"
+                        href="https://wa.me/918115502472"
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center bg-green-500 text-white px-6 py-3 rounded-full hover:bg-green-600 transition-colors shadow-lg mt-4"
