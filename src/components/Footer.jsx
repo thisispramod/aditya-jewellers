@@ -55,11 +55,11 @@ const Footer = () => {
                         <ul className="space-y-4 font-light text-gray-300">
                             <li className="flex items-start">
                                 <MapPin size={20} className="text-gold-500 mr-3 mt-1 flex-shrink-0" />
-                                <span>123, Jewel Street, Jubilee Hills,<br />Hyderabad, Telangana - 500033</span>
+                                <span>Infront of State Bank of India Golhoura Thana,<br />Bansi Etwa Road, Uttar Pradesh -272153</span>
                             </li>
                             <li className="flex items-center">
                                 <Phone size={20} className="text-gold-500 mr-3 flex-shrink-0" />
-                                <span>+91 98765 43210</span>
+                                <span>+91 8115502472</span>
                             </li>
                             <li className="flex items-center">
                                 <Mail size={20} className="text-gold-500 mr-3 flex-shrink-0" />
