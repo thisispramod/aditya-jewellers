@@ -159,8 +159,7 @@ app.post('/api/products', upload.single('imageFile'), (req, res) => {
     }
      
     // FULL image URL (works locally & on server)
-    // const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-    const imageUrl = req.file.path;
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
     db.query(
         `INSERT INTO products 
