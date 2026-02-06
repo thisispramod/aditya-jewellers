@@ -113,7 +113,7 @@ const Login = () => {
 
                     <div className="mt-6 text-center">
                         <p className="text-xs text-gray-500">
-                            Default credentials: <span className="font-mono bg-gray-100 px-2 py-1 rounded">admin / admin@123</span>
+                            Default credentials: <span className="font-mono bg-gray-100 px-2 py-1 rounded">Ask Me</span>
                         </p>
                     </div>
                 </div>
