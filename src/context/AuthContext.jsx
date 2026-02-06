@@ -4,7 +4,7 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-const API_URL = 'https://aditya-jewellers-delta.vercel.app/api';
+const API_URL = 'https://aditya-jewellers.onrender.com/api';
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);

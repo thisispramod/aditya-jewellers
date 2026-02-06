@@ -4,7 +4,8 @@ const ProductContext = createContext();
 
 export const useProducts = () => useContext(ProductContext);
 
-const API_URL = 'https://aditya-jewellers-delta.vercel.app/api';
+const API_URL = "https://aditya-jewellers.onrender.com/api";
+
 
 export const ProductProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
