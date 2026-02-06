@@ -20,6 +20,11 @@ export const ProductProvider = ({ children }) => {
         try {
             const response = await fetch(`${API_URL}/products`);
             const data = await response.json();
+            if (!Array.isArray(data)) {
+                console.error("API did not return array:", data);
+                setProducts([]);
+                return;
+            }
             setProducts(data);
             setLoading(false);
         } catch (error) {
