@@ -13,8 +13,8 @@ const Contact = () => {
                     <div className="flex items-start space-x-4">
                         <MapPin className="text-gold-500 w-6 h-6 mt-1" />
                         <div>
-                            <h3 className="font-bold text-gray-900">Store Address</h3>
-                            <p className="text-gray-600">123, Jewel Street, Jubilee Hills,<br />Hyderabad, Telangana - 500033</p>
+                            <h3 className="font-bold text-gray-900">Store Address</h3> 
+                            <p className="text-gray-600">Infront of State Bank of India Golhoura Thana,<br />Bansi Etwa Road, Uttar Pradesh -272153</p>
                             <a
                                 href="https://maps.google.com"
                                 target="_blank"

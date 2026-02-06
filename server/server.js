@@ -140,7 +140,7 @@ app.post('/api/products', upload.single('imageFile'), (req, res) => {
 
     // If a file was uploaded, use the server path
     if (req.file) {
-        finalImage = `http://localhost:4000/uploads/${req.file.filename}`;
+        finalImage = `uploads/${req.file.filename}`;
     }
 
     if (!name || !category || !price || !finalImage) {
