@@ -14,15 +14,12 @@ const ProductCard = ({ product }) => {
 
             {/* Image Container */}
             <div className="relative overflow-hidden aspect-square mb-4 bg-gray-50">
-                {/* <img
+                <img
                     src={product.image}
                     alt={product.name}
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                /> */}
-                <img
-                src={`${import.meta.env.VITE_API_URL}/${product.image}`}
-                alt={product.name}
                 />
+
                 {/* Overlay Actions */}
                 <div className="absolute bottom-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0">
                     <button className="bg-white p-2 rounded-full shadow-md text-gray-800 hover:text-red-500 hover:bg-red-50 transition-colors" title="Add to Wishlist">
