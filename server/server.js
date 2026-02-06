@@ -157,9 +157,10 @@ app.post('/api/products', upload.single('imageFile'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Image file is required' });
     }
-
+     
     // FULL image URL (works locally & on server)
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    // const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    const imageUrl = req.file.path;
 
     db.query(
         `INSERT INTO products 
