@@ -25,6 +25,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+
 // Ensure uploads folder exists
 const uploadDir = path.join(__dirname, 'uploads');
 
@@ -45,6 +46,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 const app = express();
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use(cors());
 app.use(express.json());
 
@@ -162,42 +165,55 @@ app.get('/api/products/:id', (req, res) => {
 
 // Add New Product (Admin only)
 app.post('/api/products', upload.single('imageFile'), (req, res) => {
-    const { name, category, price, originalPrice, image, isNew } = req.body;
-    let finalImage = image;
+    const { name, category, price, originalPrice, isNew } = req.body;
 
-    // If a file was uploaded, use the server path
-    if (req.file) {
-        finalImage = `uploads/${req.file.filename}`;
-    }
-
-    if (!name || !category || !price || !finalImage) {
+    // Validate required fields
+    if (!name || !category || !price) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // Image must come from file upload
+    if (!req.file) {
+        return res.status(400).json({ error: 'Image file is required' });
+    }
+
+    // FULL image URL (works locally & on server)
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
     db.query(
-        'INSERT INTO products (name, category, price, original_price, image, is_new) VALUES (?, ?, ?, ?, ?, ?)',
-        [name, category, price, originalPrice || null, finalImage, isNew === 'true' || isNew === true ? 1 : 0],
+        `INSERT INTO products 
+         (name, category, price, original_price, image, is_new) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+            name,
+            category,
+            price,
+            originalPrice || null,
+            imageUrl,
+            isNew === 'true' || isNew === true ? 1 : 0
+        ],
         (err, result) => {
             if (err) {
-                console.error(err);
+                console.error('DB ERROR:', err);
                 return res.status(500).json({ error: 'Database error' });
             }
+
             res.status(201).json({
                 message: 'Product added successfully',
-                id: result.insertId,
                 product: {
                     id: result.insertId,
                     name,
                     category,
                     price,
                     originalPrice,
-                    image: finalImage,
+                    image: imageUrl,
                     isNew: isNew === 'true' || isNew === true
                 }
             });
         }
     );
 });
+
 
 // ==================== LIVE RATES ENDPOINT ====================
 
