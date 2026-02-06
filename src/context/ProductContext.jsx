@@ -28,14 +28,13 @@ export const ProductProvider = ({ children }) => {
         }
     };
 
-    const addProduct = async (newProduct) => {
+    const addProduct = async (productData) => {
         try {
+            const isFormData = productData instanceof FormData;
             const response = await fetch(`${API_URL}/products`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newProduct),
+                headers: isFormData ? {} : { 'Content-Type': 'application/json' },
+                body: isFormData ? productData : JSON.stringify(productData),
             });
 
             const data = await response.json();

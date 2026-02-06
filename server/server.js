@@ -2,10 +2,27 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
+const multer = require('multer');
+const path = require('path');
+
+// Multer storage configuration
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from uploads folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database Connection Pool
 const db = mysql.createPool({
@@ -117,16 +134,22 @@ app.get('/api/products/:id', (req, res) => {
 });
 
 // Add New Product (Admin only)
-app.post('/api/products', (req, res) => {
+app.post('/api/products', upload.single('imageFile'), (req, res) => {
     const { name, category, price, originalPrice, image, isNew } = req.body;
+    let finalImage = image;
 
-    if (!name || !category || !price || !image) {
+    // If a file was uploaded, use the server path
+    if (req.file) {
+        finalImage = `http://localhost:4000/uploads/${req.file.filename}`;
+    }
+
+    if (!name || !category || !price || !finalImage) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     db.query(
         'INSERT INTO products (name, category, price, original_price, image, is_new) VALUES (?, ?, ?, ?, ?, ?)',
-        [name, category, price, originalPrice || null, image, isNew ? 1 : 0],
+        [name, category, price, originalPrice || null, finalImage, isNew === 'true' || isNew === true ? 1 : 0],
         (err, result) => {
             if (err) {
                 console.error(err);
@@ -141,8 +164,8 @@ app.post('/api/products', (req, res) => {
                     category,
                     price,
                     originalPrice,
-                    image,
-                    isNew
+                    image: finalImage,
+                    isNew: isNew === 'true' || isNew === true
                 }
             });
         }
