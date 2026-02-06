@@ -3,15 +3,38 @@ const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-const cloudinaryStorage = require('./cloudinaryStorage');
-const app = express(); 
+
+// Ensure uploads folder exists
+const uploadDir = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+// Multer storage configuration
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage });
+
+const app = express();
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors());
 app.use(express.json());
- 
-const storage = multer.memoryStorage();
-const upload = multer({ storage }); // ✅ THIS DEFINES `upload`
+
+// Serve static files from uploads folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Database Connection Pool
 const db = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
@@ -121,50 +144,58 @@ app.get('/api/products/:id', (req, res) => {
     });
 });
 
+// Add New Product (Admin only)
 app.post('/api/products', upload.single('imageFile'), (req, res) => {
     const { name, category, price, originalPrice, isNew } = req.body;
 
-    if (!name || !category || !price || !req.file) {
+    // Validate required fields
+    if (!name || !category || !price) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Upload to Cloudinary
-    const stream = cloudinary.uploader.upload_stream({ folder: 'products' }, (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Cloudinary upload failed' });
-        }
+    // Image must come from file upload
+    if (!req.file) {
+        return res.status(400).json({ error: 'Image file is required' });
+    }
+     
+    // FULL image URL (works locally & on server)
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
-        const imageUrl = result.secure_url;
-
-        // Insert into DB
-        db.query(
-            `INSERT INTO products (name, category, price, original_price, image, is_new) VALUES (?, ?, ?, ?, ?, ?)`,
-            [name, category, price, originalPrice || null, imageUrl, isNew === 'true' || isNew === true ? 1 : 0],
-            (err, dbResult) => {
-                if (err) {
-                    console.error('DB ERROR:', err);
-                    return res.status(500).json({ error: 'Database error' });
-                }
-
-                res.status(201).json({
-                    message: 'Product added successfully',
-                    product: {
-                        id: dbResult.insertId,
-                        name,
-                        category,
-                        price,
-                        originalPrice,
-                        image: imageUrl,
-                        isNew: isNew === 'true' || isNew === true
-                    }
-                });
+    db.query(
+        `INSERT INTO products 
+         (name, category, price, original_price, image, is_new) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+            name,
+            category,
+            price,
+            originalPrice || null,
+            imageUrl,
+            isNew === 'true' || isNew === true ? 1 : 0
+        ],
+        (err, result) => {
+            if (err) {
+                console.error('DB ERROR:', err);
+                return res.status(500).json({ error: 'Database error' });
             }
-        );
-    });
 
-    streamifier.createReadStream(req.file.buffer).pipe(stream);
+            res.status(201).json({
+                message: 'Product added successfully',
+                product: {
+                    id: result.insertId,
+                    name,
+                    category,
+                    price,
+                    originalPrice,
+                    image: imageUrl,
+                    isNew: isNew === 'true' || isNew === true
+                }
+            });
+        }
+    );
 });
+
+
 // ==================== LIVE RATES ENDPOINT ====================
 
 // Get Live Gold Rates (Mock)
