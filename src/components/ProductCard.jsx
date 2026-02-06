@@ -15,7 +15,7 @@ const ProductCard = ({ product }) => {
             {/* Image Container */}
             <div className="relative overflow-hidden aspect-square mb-4 bg-gray-50">
                 <img
-                    src={product.image}
+                    src={`${import.meta.env.VITE_API_URL}/${product.image}`}
                     alt={product.name}
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                 />
