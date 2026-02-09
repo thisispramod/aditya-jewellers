@@ -33,29 +33,38 @@ export const ProductProvider = ({ children }) => {
         }
     };
 
-    const addProduct = async (productData) => {
-        try {
-            const isFormData = productData instanceof FormData;
-            const response = await fetch(`${API_URL}/products`, {
-                method: 'POST',
-                headers: isFormData ? {} : { 'Content-Type': 'application/json' },
-                body: isFormData ? productData : JSON.stringify(productData),
-            });
+const addProduct = async (productData) => {
+    try {
+        const response = await fetch(`${API_URL}/products`, {
+            method: 'POST',
+            body: productData, // FormData ONLY
+        });
 
-            const data = await response.json();
+        const data = await response.json();
 
-            if (response.ok) {
-                // Add the new product to the local state
-                setProducts(prev => [data.product, ...prev]);
-                return { success: true, message: 'Product added successfully!' };
-            } else {
-                return { success: false, error: data.error || 'Failed to add product' };
-            }
-        } catch (error) {
-            console.error('Error adding product:', error);
-            return { success: false, error: 'Connection error. Please check if the server is running.' };
+        if (!response.ok) {
+            return {
+                success: false,
+                error: data.error || 'Failed to add product',
+            };
         }
-    };
+
+        // Update local state
+        setProducts((prev) => [data.product, ...prev]);
+
+        return {
+            success: true,
+            message: 'Product added successfully!',
+        };
+    } catch (error) {
+        console.error('Error adding product:', error);
+        return {
+            success: false,
+            error: 'Connection error. Please check if the server is running.',
+        };
+    }
+};
+
 
     return (
         <ProductContext.Provider value={{ products, addProduct, loading, refreshProducts: fetchProducts }}>
