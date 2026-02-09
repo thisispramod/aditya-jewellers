@@ -3,37 +3,11 @@ const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-
-
-// Ensure uploads folder exists
-const uploadDir = path.join(__dirname, 'uploads');
-
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
-
-// Multer storage configuration
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-
-const upload = multer({ storage });
-
+const cloudinaryStorage = require('./cloudinaryStorage');
+const upload = multer({ storage: cloudinaryStorage });
 const app = express();
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 app.use(cors());
 app.use(express.json());
-
-// Serve static files from uploads folder
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database Connection Pool
 const db = mysql.createPool({
@@ -148,23 +122,21 @@ app.get('/api/products/:id', (req, res) => {
 app.post('/api/products', upload.single('imageFile'), (req, res) => {
     const { name, category, price, originalPrice, isNew } = req.body;
 
-    // Validate required fields
-    if (!name || !category || !price) {
+    let imageUrl = null;
+
+    // If file uploaded → Cloudinary URL
+    if (req.file) {
+        imageUrl = req.file.path; // Cloudinary secure URL
+    }
+
+    if (!name || !category || !price || !imageUrl) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Image must come from file upload
-    if (!req.file) {
-        return res.status(400).json({ error: 'Image file is required' });
-    }
-     
-    // FULL image URL (works locally & on server)
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-
     db.query(
         `INSERT INTO products 
-         (name, category, price, original_price, image, is_new) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
+        (name, category, price, original_price, image, is_new) 
+        VALUES (?, ?, ?, ?, ?, ?)`,
         [
             name,
             category,
@@ -175,7 +147,7 @@ app.post('/api/products', upload.single('imageFile'), (req, res) => {
         ],
         (err, result) => {
             if (err) {
-                console.error('DB ERROR:', err);
+                console.error(err);
                 return res.status(500).json({ error: 'Database error' });
             }
 
@@ -193,9 +165,7 @@ app.post('/api/products', upload.single('imageFile'), (req, res) => {
             });
         }
     );
-});
-
-
+}); 
 // ==================== LIVE RATES ENDPOINT ====================
 
 // Get Live Gold Rates (Mock)
