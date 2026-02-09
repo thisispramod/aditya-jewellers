@@ -121,14 +121,17 @@ app.get('/api/products/:id', (req, res) => {
 // Add New Product (Admin only)
 app.post('/api/products', upload.single('imageFile'), (req, res) => {
     const { name, category, price, originalPrice, isNew } = req.body;
-
+ 
     let imageUrl = null;
 
-    // If file uploaded → Cloudinary URL
     if (req.file) {
-        imageUrl = req.file.path; // Cloudinary secure URL
+        imageUrl = req.file.path; // Cloudinary URL
     }
 
+    if (!imageUrl && req.body.image) {
+        imageUrl = req.body.image; // URL mode
+    }
+    
     if (!name || !category || !price || !imageUrl) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
