@@ -23,7 +23,7 @@ const FeaturedCollection = () => {
             id: 3,
             title: "Diamond Solitaires",
             // Diamond Ring/Jewellery
-            image: "https://unsplash.com/photos/silver-diamond-ring-on-brown-wooden-table-HWuRRF9c9Ns",
+            image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=2070&auto=format&fit=crop",
             link: "/collections/diamond"
         }
     ];
