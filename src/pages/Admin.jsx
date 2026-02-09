@@ -51,51 +51,43 @@ const Admin = () => {
         if (fileInput) fileInput.value = '';
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setStatus('Adding product...');
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('Adding product...');
 
-        let submissionData;
+    const data = new FormData();
 
-        if (imageType === 'file' && selectedFile) {
-            const data = new FormData();
-            data.append('name', formData.name);
-            data.append('category', formData.category);
-            data.append('price', formData.price);
-            data.append('originalPrice', formData.originalPrice);
-            data.append('isNew', formData.isNew);
-            data.append('imageFile', selectedFile);
-            submissionData = data;
-        } else {
-            submissionData = {
-                name: formData.name,
-                category: formData.category,
-                price: Number(formData.price),
-                originalPrice: formData.originalPrice ? Number(formData.originalPrice) : null,
-                image: formData.image,
-                isNew: formData.isNew
-            };
-        }
+    data.append('name', formData.name);
+    data.append('category', formData.category);
+    data.append('price', formData.price);
+    data.append('originalPrice', formData.originalPrice);
+    data.append('isNew', formData.isNew);
 
-        const result = await addProduct(submissionData);
+    if (imageType === 'file' && selectedFile) {
+        data.append('imageFile', selectedFile); // multer
+    } else {
+        data.append('image', formData.image); // URL case
+    }
 
-        if (result.success) {
-            setStatus('✅ Product added successfully!');
-            setFormData({
-                name: '',
-                category: 'Gold',
-                price: '',
-                originalPrice: '',
-                image: '',
-                isNew: false
-            });
-            setSelectedFile(null);
-            setPreviewUrl('');
-        } else {
-            setStatus(`❌ Error: ${result.error}`);
-        }
+    const result = await addProduct(data);
 
-        setTimeout(() => setStatus(''), 3000);
+    if (result.success) {
+        setStatus('Product added successfully!');
+        setFormData({
+        name: '',
+        category: 'Gold',
+        price: '',
+        originalPrice: '',
+        image: '',
+        isNew: false
+        });
+        setSelectedFile(null);
+        setPreviewUrl('');
+    } else {
+        setStatus(`Error: ${result.error}`);
+    }
+
+    setTimeout(() => setStatus(''), 3000);
     };
 
     const handleLogout = () => {

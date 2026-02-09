@@ -33,37 +33,37 @@ export const ProductProvider = ({ children }) => {
         }
     };
 
-const addProduct = async (productData) => {
-    try {
-        const response = await fetch(`${API_URL}/products`, {
-            method: 'POST',
-            body: productData, // FormData ONLY
-        });
+    const addProduct = async (productData) => {
+        try {
+            const response = await fetch(`${API_URL}/products`, {
+                method: 'POST',
+                body: productData, // FormData ONLY
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (!response.ok) {
+            if (!response.ok) {
+                return {
+                    success: false,
+                    error: data.error || 'Failed to add product',
+                };
+            }
+
+            // Update local state
+            setProducts((prev) => [data.product, ...prev]);
+
+            return {
+                success: true,
+                message: 'Product added successfully!',
+            };
+        } catch (error) {
+            console.error('Error adding product:', error);
             return {
                 success: false,
-                error: data.error || 'Failed to add product',
+                error: 'Connection error. Please check if the server is running.',
             };
         }
-
-        // Update local state
-        setProducts((prev) => [data.product, ...prev]);
-
-        return {
-            success: true,
-            message: 'Product added successfully!',
-        };
-    } catch (error) {
-        console.error('Error adding product:', error);
-        return {
-            success: false,
-            error: 'Connection error. Please check if the server is running.',
-        };
-    }
-};
+    };
 
 
     return (
