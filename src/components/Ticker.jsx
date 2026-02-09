@@ -1,24 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { usePrices } from '../context/PriceContext';
 
 const Ticker = () => {
-    // Mock prices as fallback, in a real app these would come from an API
-    const [prices, setPrices] = useState({
-        gold24k: 7250,
-        gold22k: 6650,
-        silver: 88.50
-    });
+    const { prices, loading } = usePrices();
 
-    useEffect(() => {
-        // Simulate live updates
-        const interval = setInterval(() => {
-            setPrices(prev => ({
-                gold24k: prev.gold24k + (Math.random() > 0.5 ? 5 : -5),
-                gold22k: prev.gold22k + (Math.random() > 0.5 ? 5 : -5),
-                silver: prev.silver + (Math.random() > 0.5 ? 0.5 : -0.5)
-            }));
-        }, 5000);
-        return () => clearInterval(interval);
-    }, []);
+    if (loading) return (
+        <div className="bg-gray-900 text-gold-100 py-3 text-center text-xs animate-pulse">
+            Fetching latest market rates...
+        </div>
+    );
 
     return (
         <div className="bg-gray-900 text-gold-100 py-3 overflow-hidden border-b border-gold-800">
